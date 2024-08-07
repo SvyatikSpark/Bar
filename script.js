@@ -14,3 +14,22 @@ function добавитьКартинку() {
   }
   
   window.onload = добавитьКартинку;
+  const audioFiles = ['vine.mp3', 'oplata.mp3']; // Список аудиофайлов
+
+function playRandomAudio() {
+  // Выбираем случайный файл из списка
+  const randomIndex = Math.floor(Math.random() * audioFiles.length);
+  const randomAudioFile = audioFiles[randomIndex];
+
+  // Создаем новый элемент аудио
+  const audio = new Audio(randomAudioFile);
+
+  // Проигрываем звук
+  audio.play();
+
+  // Запускаем функцию снова через случайный промежуток времени (1-5 секунд)
+  setTimeout(playRandomAudio, (Math.random() * 4 + 1) * 1000); 
+}
+
+// Запускаем функцию при загрузке страницы
+window.onload = playRandomAudio;

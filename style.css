@@ -16,7 +16,7 @@ figure {
 img {
   width: 100%;
   height: auto;
-  border-radius: 50%;
+  border-radius: 100%;
 }
 figcaption {
   font-size: 24px;
