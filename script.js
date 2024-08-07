@@ -1,35 +1,41 @@
 function добавитьКартинку() {
     const img = document.createElement('img');
     img.src = 'oplata.png'; 
-  
+    img.classList.add('oplata-img');
     img.style.position = 'absolute';
     img.style.left = Math.random() * window.innerWidth + 'px';
     img.style.top = Math.random() * window.innerHeight + 'px';
-  
-    // Добавляем изображение на страницу
     document.body.appendChild(img);
-  
-
     setTimeout(добавитьКартинку, Math.random() * 2000);
   }
   
-  window.onload = добавитьКартинку;
-  const audioFiles = ['vine.mp3', 'oplata.mp3']; // Список аудиофайлов
+  const audioFiles = ['vine.mp3', 'oplata.mp3']; 
+  let currentAudio = new Audio('g.mp3'); // Аудио g.mp3 по кругу
+  currentAudio.loop = true; // Включаем зацикливание
+  currentAudio.play(); // Запускаем g.mp3
+  
+  function playRandomAudio() {
+    const randomIndex = Math.floor(Math.random() * audioFiles.length);
+    const randomAudioFile = audioFiles[randomIndex];
+    const audio = new Audio(randomAudioFile);
+    audio.play();
+    setTimeout(playRandomAudio, (Math.random() * 4 + 1) * 500); 
+  }
+  
+  window.onload = () => {
+    добавитьКартинку();
+    playRandomAudio();
+  };
 
-function playRandomAudio() {
-  // Выбираем случайный файл из списка
-  const randomIndex = Math.floor(Math.random() * audioFiles.length);
-  const randomAudioFile = audioFiles[randomIndex];
-
-  // Создаем новый элемент аудио
-  const audio = new Audio(randomAudioFile);
-
-  // Проигрываем звук
-  audio.play();
-
-  // Запускаем функцию снова через случайный промежуток времени (1-5 секунд)
-  setTimeout(playRandomAudio, (Math.random() * 4 + 1) * 1000); 
-}
-
-// Запускаем функцию при загрузке страницы
-window.onload = playRandomAudio;
+  const gAudio = new Audio('g.mp3'); 
+  gAudio.loop = true; 
+  gAudio.volume = 0.1;
+  
+  // Пытаемся запустить звук сразу 
+  gAudio.play().catch(error => {
+    console.log("Автовоспроизведение звука заблокировано. Нажмите на страницу.");
+    document.addEventListener('click', () => {
+      gAudio.play();
+      document.removeEventListener('click', playGAudio); 
+    });
+  }); 
