@@ -24,7 +24,7 @@ function playRandomAudio() {
 
 function создатьКаплю() {
   const капля = document.createElement('img'); 
-  капля.src = 'Oplata.png'; // Используем картинку для капель
+  капля.src = 'oplata.png'; // Используем картинку для капель
   капля.classList.add('капля');
   капля.style.left = Math.random() * 100 + 'vw';
   капля.style.animationDuration = Math.random() * 3 + 2 + 's';
