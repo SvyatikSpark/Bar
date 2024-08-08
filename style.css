@@ -5,24 +5,47 @@ body {
   justify-content: center;
   height: 100vh;
   margin: 0;
+  overflow: hidden; /* Чтобы капли не выходили за границы */
 }
+
 figure {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+  z-index: 1; /* Чтобы контент был поверх дождя */
 }
+
 img {
   width: 100%;
   height: auto;
 }
+
 figcaption {
   font-size: 24px;
   font-weight: bold;
   margin-top: 10px;
 }
+
 .oplata-img {
   width: 501px; 
   height: auto; 
+}
+
+.капля {
+  position: absolute;
+  top: -10px;
+  width: 100px; /* Настройте размер по необходимости */
+  height: auto;  /* Высота подстроится автоматически */
+  animation: падение 5s linear infinite;
+}
+
+@keyframes падение {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
 }
