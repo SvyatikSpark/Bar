@@ -1,53 +1,71 @@
-function добавитьКартинку() {
-  const img = document.createElement('img');
-  img.src = 'oplata.png'; 
-  img.classList.add('oplata-img');
-  img.style.position = 'absolute';
-  img.style.left = Math.random() * window.innerWidth + 'px';
-  img.style.top = Math.random() * window.innerHeight + 'px';
-  document.body.appendChild(img);
-  setTimeout(добавитьКартинку, Math.random() * 2000);
+const inputText = document.getElementById('input-text');
+const submitButton = document.getElementById('submit-button');
+const randomCaseButton = document.getElementById('random-case-button');
+const spacesButton = document.getElementById('spaces-button');
+
+const dotEmojis = ["💥", "🔥", "🔞", "🤖", "💋", "🍓", "✅", "😏", "👄", "📎"];
+
+function modifyText(text) {
+  let modifiedText = '';
+  let skipFormatting = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (char === '@') { 
+      skipFormatting = true; 
+      modifiedText += char;
+    } else if (skipFormatting &&  (char === ' ' || i === text.length - 1)) {
+      skipFormatting = false;
+      modifiedText += char; 
+    } else if (!skipFormatting) {
+      if (char === ".") {
+        modifiedText += randomChoice(dotEmojis);
+      } else if (char === "\n") {
+        modifiedText += "\n";
+      } else {
+        modifiedText += ` ${char} `;
+      }
+    } else {
+      modifiedText += char;
+    }
+  }
+  return modifiedText;
 }
 
-const audioFiles = ['vine.mp3', 'oplata.mp3']; 
-let currentAudio = new Audio('g.mp3'); 
-currentAudio.loop = true; 
-currentAudio.play(); 
 
-function playRandomAudio() {
-  const randomIndex = Math.floor(Math.random() * audioFiles.length);
-  const randomAudioFile = audioFiles[randomIndex];
-  const audio = new Audio(randomAudioFile);
-  audio.play();
-  setTimeout(playRandomAudio, (Math.random() * 4 + 1) * 500); 
-}
-
-function создатьКаплю() {
-  const капля = document.createElement('img'); 
-  капля.src = 'img/oplata.png'; // Используем картинку для капель
-  капля.classList.add('капля');
-  капля.style.left = Math.random() * 100 + 'vw';
-  капля.style.animationDuration = Math.random() * 3 + 2 + 's';
-  document.body.appendChild(капля);
-  setTimeout(() => {
-    капля.remove();
-  }, 5000);
-}
-
-window.onload = () => {
-  добавитьКартинку();
-  playRandomAudio();
-  setInterval(создатьКаплю, 100);
-};
-
-const gAudio = new Audio('g.mp3'); 
-gAudio.loop = true; 
-gAudio.volume = 0.1;
-
-gAudio.play().catch(error => {
-  console.log("Автовоспроизведение звука заблокировано. Нажмите на страницу.");
-  document.addEventListener('click', () => {
-    gAudio.play();
-    document.removeEventListener('click', playGAudio); 
+function randomizeUsernameCase(text) {
+  return text.replace(/@(\w+)/g, (match, username) => {
+    let randomizedUsername = '';
+    for (let i = 0; i < username.length; i++) {
+      randomizedUsername += Math.random() < 0.5 ? username[i].toUpperCase() : username[i].toLowerCase();
+    }
+    return `@${randomizedUsername}`;
   });
-}); 
+}
+
+function handleModifyText() {
+  const originalText = inputText.value;
+  inputText.value = modifyText(originalText); 
+}
+
+function handleRandomCase() {
+  inputText.value = randomizeUsernameCase(inputText.value);
+}
+
+function handleSpaces() {
+  const text = inputText.value;
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += text + '\n\n\n\n\n';
+  }
+  inputText.value = result;
+}
+
+function randomChoice(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+submitButton.addEventListener('click', handleModifyText);
+randomCaseButton.addEventListener('click', handleRandomCase);
+spacesButton.addEventListener('click', handleSpaces);
