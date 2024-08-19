@@ -56,7 +56,7 @@ function handleRandomCase() {
 function handleSpaces() {
   const text = inputText.value;
   let result = '';
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 3; i++) {
     result += text + '\n\n\n\n\n';
   }
   inputText.value = result;
