@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Спамербук - Казик</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" id="auth-form">
+    <h2>Авторизация</h2>
+    <input type="text" id="username" placeholder="Никнейм">
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="auth()">Войти</button>
+    <button onclick="showRegistrationForm()">Регистрация</button>
+  </div>
+
+  <div class="container" id="registration-form" style="display: none;">
+    <h2>Регистрация</h2>
+    <input type="text" id="reg-username" placeholder="Никнейм">
+    <input type="password" id="reg-password" placeholder="Пароль">
+    <button onclick="register()">Зарегистрироваться</button>
+  </div>
+
+  <nav class="hamburger-menu">
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-button">☰</label>
+    <ul class="menu-links">
+      <li><a href="creobot.html">CreoBot</a></li>
+      <li><a href="hall-of-fame.html">Hall of Fame</a></li>
+      <li><a href="#" onclick="logout()" id="logout-link" style="display: none;">Выйти</a></li> 
+    </ul>
+  </nav>
+
+  <div class="container" id="game-container" style="display: none;">
+    <h1>Казик</h1>
+    <p>Баланс: <span id="balance">Загрузка...</span></p>
+    <input type="number" id="bet-amount" placeholder="Введите сумму">
+    <button onclick="playGame()">Играть</button>
+    <div id="animation-container">
+      <div class="reel" id="reel1"></div>
+      <div class="reel" id="reel2"></div>
+      <div class="reel" id="reel3"></div>
+    </div> 
+    <div id="game-result"></div>
+
+    <h2>Таблица лидеров</h2>
+    <table id="leaderboard">
+      <thead>
+        <tr>
+          <th>Место</th>
+          <th>Никнейм</th>
+          <th>Баланс</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3">Загрузка...</td></tr> 
+      </tbody>
+    </table>
+  </div>
+
+  <script>const emojis = ["валера", "🔥", "🔞", "🤖", "💋", "🍓"];
+    const dataFile = 'data.txt'; 
+    let users = []; 
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers(); 
+        checkAuth();
+    });
+    
+    function getRandomEmoji() {
+      return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+    
+    function playGame() {
+      const betAmount = parseInt(document.getElementById('bet-amount').value);
+      if (isNaN(betAmount) || betAmount <= 0) {
+        alert('Введите корректную сумму!');
+        return;
+      }
+    
+      const username = localStorage.getItem('user'); 
+      const user = users.find(user => user.username === username);
+    
+      if (user.balance < betAmount) { 
+          alert('Недостаточно средств!');
+          return; 
+      }
+    
+      const reels = [
+        document.getElementById('reel1'),
+        document.getElementById('reel2'),
+        document.getElementById('reel3')
+      ];
+    
+      const result = [];
+    
+      reels.forEach(reel => {
+        reel.innerHTML = ''; 
+      });
+    
+      for (let i = 0; i < reels.length; i++) {
+        const randomEmoji = getRandomEmoji();
+        reels[i].textContent = randomEmoji;
+        result[i] = randomEmoji;
+      }
+    
+      const uniqueEmojis = new Set(result);
+      const resultMessage = document.getElementById('game-result');
+      let winAmount = 0;
+      if (uniqueEmojis.size === 1) {
+        winAmount = betAmount * 10;
+        resultMessage.textContent = `Вы выиграли! (+${winAmount} монет)`;
+      } else if (uniqueEmojis.size === 2) {
+        winAmount = betAmount * 0.3;
+        resultMessage.textContent = `Вы выиграли! (+${winAmount} монет)`;
+      } else {
+        winAmount = -betAmount;
+        resultMessage.textContent = `Вы проиграли! (-${betAmount} монет)`;
+      }
+      updateBalance(winAmount);
+    }
+    
+    function checkAuth() {
+      const username = localStorage.getItem('user');
+      if (username) {
+        setTimeout(() => {
+          const user = users.find(user => user.username === username);
+          if (user) {
+            showGame(user);
+            updateLeaderboard();
+          } else {
+            logout();
+          }
+        }, 1000); 
+      } else {
+        document.getElementById('auth-form').style.display = 'flex';
+      }
+    }
+    
+    function auth() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+    
+      setTimeout(() => {
+        const user = users.find(user => user.username === username && user.password === password);
+        if (user) {
+          localStorage.setItem('user', username);
+          showGame(user);
+          updateLeaderboard();
+        } else {
+          alert('Неверный логин или пароль!');
+        }
+      }, 1000);
+    }
+    
+    function showRegistrationForm() {
+      document.getElementById('auth-form').style.display = 'none';
+      document.getElementById('registration-form').style.display = 'flex';
+    }
+    
+    function register() {
+      const username = document.getElementById('reg-username').value;
+      const password = document.getElementById('reg-password').value;
+      setTimeout(() => {
+        const existingUser = users.find(user => user.username === username);
+        if (existingUser) {
+          alert('Пользователь с таким ником уже существует!');
+        } else {
+          const newUser = { username, password, balance: 1000 };
+          users.push(newUser);
+          saveUsers(); 
+          alert('Регистрация прошла успешно!');
+          document.getElementById('registration-form').style.display = 'none';
+          document.getElementById('auth-form').style.display = 'flex';
+        }
+      }, 1000);
+    }
+    
+    function logout() {
+      localStorage.removeItem('user');
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('auth-form').style.display = 'flex';
+      document.getElementById('logout-link').style.display = 'none';
+    }
+    
+    function showGame(user) {
+      document.getElementById('auth-form').style.display = 'none';
+      document.getElementById('registration-form').style.display = 'none';
+      document.getElementById('game-container').style.display = 'flex';
+      document.getElementById('logout-link').style.display = 'block';
+      document.getElementById('balance').textContent = `Баланс: ${user.balance}`;
+    }
+    
+    function updateBalance(amount) {
+      const username = localStorage.getItem('user');
+      if (!username) return;
+      const user = users.find(user => user.username === username);
+      if (user) {
+        user.balance = Math.floor(user.balance + amount); 
+        if (user.balance < 0) {
+          user.balance = 0;
+        }
+        saveUsers();
+        document.getElementById('balance').textContent = `Баланс: ${user.balance}`;
+        updateLeaderboard();
+      }
+    }
+    
+    function updateLeaderboard() {
+        const leaderboardTbody = document.querySelector('#leaderboard tbody');
+        leaderboardTbody.innerHTML = ''; 
+    
+        users
+        .sort((a, b) => b.balance - a.balance) 
+        .forEach((user, index) => {
+            const row = leaderboardTbody.insertRow();
+            row.insertCell().textContent = index + 1;
+            row.insertCell().textContent = user.username;
+            row.insertCell().textContent = user.balance;
+        });
+    }
+    
+    function loadUsers() {
+      const data = localStorage.getItem('users');
+      if (data) {
+        users = JSON.parse(data);
+      } else {
+        users = []; 
+      }
+    }
+    
+    function saveUsers() {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    
+    function deleteUser(username) {
+      const userIndex = users.findIndex(user => user.username === username);
+      if (userIndex !== -1) {
+        users.splice(userIndex, 1);
+        saveUsers();
+        updateLeaderboard();
+        alert(`Пользователь ${username} удален.`);
+      } else {
+        alert(`Пользователь ${username} не найден.`);
+      }
+    }
+    
+    function changeBalance(username, newBalance) {
+      const user = users.find(user => user.username === username);
+      if (user) {
+        user.balance = newBalance; 
+        saveUsers();
+        updateLeaderboard();
+        alert(`Баланс пользователя ${username} изменен на ${newBalance}.`);
+      } else {
+        alert(`Пользователь ${username} не найден.`);
+      }
+    }
+    
+    function deleteUserConsole() {
+      const username = prompt("Введите никнейм пользователя для удаления:");
+      if (username) {
+        deleteUser(username);
+      } else {
+        console.log("Удаление отменено.");
+      }
+    }
+    
+    function changeBalanceConsole() {
+      const username = prompt("Введите никнейм пользователя:");
+      if (username) {
+        const newBalanceStr = prompt("Введите новый баланс:");
+        const newBalance = parseInt(newBalanceStr);
+        if (!isNaN(newBalance)) {
+          changeBalance(username, newBalance);
+        } else {
+          console.log("Некорректный формат баланса.");
+        }
+      } else {
+        console.log("Изменение баланса отменено.");
+      }
+    }</script> </body>
+</html>
