@@ -24,7 +24,12 @@ function modifyText(text) {
       } else if (char === "\n") {
         modifiedText += "\n";
       } else {
-        modifiedText += ` ${char} `;
+        // Случайное количество пробелов от 1 до 3
+        const spacesCount = Math.floor(Math.random() * 3) + 1;
+        for (let j = 0; j < spacesCount; j++) {
+          modifiedText += " ";
+        }
+        modifiedText += char;
       }
     } else {
       modifiedText += char;
@@ -32,7 +37,6 @@ function modifyText(text) {
   }
   return modifiedText;
 }
-
 
 function randomizeUsernameCase(text) {
   return text.replace(/@(\w+)/g, (match, username) => {
@@ -56,11 +60,23 @@ function handleRandomCase() {
 function handleSpaces() {
   const text = inputText.value;
   let result = '';
-  for (let i = 0; i < 5; i++) {
-    result += text + '\n\n\n\n\n';
+  const blocksCount = 3; 
+
+  for (let i = 0; i < blocksCount; i++) {
+    result += text; 
+
+    // Добавляем энтеры только если это не последний блок
+    if (i < blocksCount - 1) {
+      // Случайное количество энтеров от 5 до 8
+      const enterCount = Math.floor(Math.random() * 4) + 5;
+      for (let j = 0; j < enterCount; j++) {
+        result += '\n';
+      }
+    }
   }
   inputText.value = result;
 }
+
 
 function randomChoice(array) {
   return array[Math.floor(Math.random() * array.length)];
