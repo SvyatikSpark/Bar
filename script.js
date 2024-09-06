@@ -12,24 +12,26 @@ function modifyText(text) {
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
 
-    if (char === '@') { 
-      skipFormatting = true; 
+    if (char === '@') {
+      skipFormatting = true;
       modifiedText += char;
-    } else if (skipFormatting &&  (char === ' ' || i === text.length - 1)) {
+    } else if (skipFormatting && (char === ' ' || i === text.length - 1)) {
       skipFormatting = false;
-      modifiedText += char; 
+      modifiedText += char;
     } else if (!skipFormatting) {
       if (char === ".") {
         modifiedText += randomChoice(dotEmojis);
       } else if (char === "\n") {
         modifiedText += "\n";
       } else {
-        // Случайное количество пробелов от 1 до 3
-        const spacesCount = Math.floor(Math.random() * 3) + 1;
-        for (let j = 0; j < spacesCount; j++) {
-          modifiedText += " ";
+        // Добавляем пробелы, только если это не начало текста и не начало строки
+        if (modifiedText.length > 0 && modifiedText[modifiedText.length - 1] !== '\n') { 
+          const spacesCount = Math.floor(Math.random() * 3) + 1;
+          for (let j = 0; j < spacesCount; j++) {
+            modifiedText += " ";
+          }
         }
-        modifiedText += char;
+        modifiedText += char; 
       }
     } else {
       modifiedText += char;
@@ -37,7 +39,6 @@ function modifyText(text) {
   }
   return modifiedText;
 }
-
 function randomizeUsernameCase(text) {
   return text.replace(/@(\w+)/g, (match, username) => {
     let randomizedUsername = '';
